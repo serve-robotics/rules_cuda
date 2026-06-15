@@ -22,12 +22,13 @@ runs:
   using: "composite"
   steps:
     - name: Install CUDA (NVIDIA, Linux)
-      uses: Jimver/cuda-toolkit@v0.2.11
+      uses: Jimver/cuda-toolkit@acce010762576d6d7eafccf022b5e1e808f210b7 # v0.2.11
       if: ${{ !startsWith(inputs.os, 'windows') && inputs.source == 'nvidia' }}
       with:
         cuda: ${{ inputs.cuda-version }}
         sub-packages: '["nvcc", "cudart-dev"]'
         method: network
+        use-github-cache: false
     - name: Show bin, include, lib (NVIDIA, Linux)
       if: ${{ !startsWith(inputs.os, 'windows') && inputs.source == 'nvidia' }}
       shell: bash
@@ -39,19 +40,22 @@ runs:
       if: ${{ !startsWith(inputs.os, 'windows') && inputs.toolchain == 'llvm' }}
       shell: bash
       run: |
-        wget https://apt.llvm.org/llvm.sh
-        chmod +x llvm.sh
-        sudo ./llvm.sh ${{ inputs.toolchain-version }}
+        # Download to /tmp so a PR-supplied llvm.sh in the workspace cannot be
+        # used as a fallback if wget fails.
+        wget -qO /tmp/llvm.sh https://apt.llvm.org/llvm.sh
+        chmod +x /tmp/llvm.sh
+        sudo /tmp/llvm.sh ${{ inputs.toolchain-version }}
         sudo ln -sf /usr/bin/clang-${{ inputs.toolchain-version }} /usr/bin/clang
         clang --version
     - name: Install CURAND For LLVM
-      uses: Jimver/cuda-toolkit@v0.2.11
+      uses: Jimver/cuda-toolkit@acce010762576d6d7eafccf022b5e1e808f210b7 # v0.2.11
       if: ${{ !startsWith(inputs.os, 'windows') && inputs.toolchain == 'llvm' }}
       with:
         cuda: ${{ inputs.cuda-version }}
         sub-packages: '["nvcc", "cudart-dev"]' # avoid full cuda install
         non-cuda-sub-packages: '["libcurand-dev"]'
         method: network
+        use-github-cache: false
     - name: Install CUDA (Ubuntu)
       if: ${{ !startsWith(inputs.os, 'windows') && inputs.source == 'ubuntu' }}
       shell: bash
@@ -64,12 +68,13 @@ runs:
         echo "CXX=g++-9" >> $GITHUB_ENV
 
     - name: Install CUDA (Windows)
-      uses: Jimver/cuda-toolkit@v0.2.11
+      uses: Jimver/cuda-toolkit@acce010762576d6d7eafccf022b5e1e808f210b7 # v0.2.11
       if: ${{ startsWith(inputs.os, 'windows') }}
       with:
         cuda: ${{ inputs.cuda-version }}
         sub-packages: '["nvcc", "cudart"]'
         method: network
+        use-github-cache: false
     - name: Show bin, include, lib64 (Windows)
       if: ${{ startsWith(inputs.os, 'windows') }}
       shell: pwsh
