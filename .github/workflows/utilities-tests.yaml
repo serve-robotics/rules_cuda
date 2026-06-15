@@ -28,10 +28,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: bazelbuild/setup-bazelisk@v2
+      - uses: bazelbuild/setup-bazelisk@v3
       - name: Mount bazel cache
         if: ${{ !startsWith(matrix.os, 'windows') }}
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/bazel
           key: bazel-${{ matrix.os }}-${{ matrix.bazel-version }}
