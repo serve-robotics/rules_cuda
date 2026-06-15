@@ -6,9 +6,13 @@ on:
       - main
   pull_request:
 
+permissions: {}
+
 jobs:
   test:
     name: "Test Utilities (bazel ${{ matrix.bazel-version }} on ${{ matrix.os }})"
+    permissions:
+      contents: read
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:

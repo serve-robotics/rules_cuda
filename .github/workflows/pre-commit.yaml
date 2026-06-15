@@ -6,8 +6,13 @@ on:
       - main
   pull_request:
 
+permissions: {}
+
 jobs:
   pre-commit:
+    permissions:
+      contents: write
+      pull-requests: write
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4

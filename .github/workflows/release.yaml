@@ -8,8 +8,12 @@ on:
     tags:
       - "v*.*.*"
 
+permissions: {}
+
 jobs:
   build:
+    permissions:
+      contents: write
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:

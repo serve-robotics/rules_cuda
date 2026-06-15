@@ -6,9 +6,13 @@ on:
       - main
   pull_request:
 
+permissions: {}
+
 jobs:
   test:
     name: "Test Examples Build (CUDA ${{ matrix.cases.cuda-version }} on ${{ matrix.cases.os }})"
+    permissions:
+      contents: read
     runs-on: ${{ matrix.cases.os }}
     timeout-minutes: 60
     strategy:
