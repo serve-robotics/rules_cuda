@@ -6,9 +6,13 @@ on:
       - main
   pull_request:
 
+permissions: {}
+
 jobs:
   test:
     name: "Test Examples Build (CUDA ${{ matrix.cases.cuda-version }} on ${{ matrix.cases.os }})"
+    permissions:
+      contents: read
     runs-on: ${{ matrix.cases.os }}
     timeout-minutes: 60
     strategy:
@@ -33,10 +37,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: bazelbuild/setup-bazelisk@v2
+      - uses: bazelbuild/setup-bazelisk@v3
       - name: Mount bazel cache
         if: ${{ !startsWith(matrix.cases.os, 'windows') }}
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/bazel
           key: bazel-${{ matrix.cases.os }}-cuda-${{ matrix.cases.cuda-version }}-${{ hashFiles('.bazelversion') }}

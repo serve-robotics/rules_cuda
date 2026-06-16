@@ -20,6 +20,8 @@ def _init(module_ctx):
                 fail("Multiple conflicting toolchains declared for name {} ({} and {}".format(toolchain.name, toolchain.toolkit_path, registrations[toolchain.name]))
             else:
                 registrations[toolchain.name] = toolchain.toolkit_path
+    if not registrations:
+        registrations["local_cuda"] = ""
     for name, toolkit_path in registrations.items():
         local_cuda(name = name, toolkit_path = toolkit_path)
 

@@ -5,9 +5,13 @@ on:
   issue_comment:
     types: [created]
 
+permissions: {}
+
 jobs:
   test-manual:
     name: "Integration Test Build (Manual)"
+    permissions:
+      contents: read
     if: github.event_name == 'workflow_dispatch'
     runs-on: ${{ matrix.cases.os }}
     timeout-minutes: 60
@@ -30,10 +34,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: bazelbuild/setup-bazelisk@v2
+      - uses: bazelbuild/setup-bazelisk@v3
       - name: Mount bazel cache
         if: ${{ !startsWith(matrix.cases.os, 'windows') }}
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/bazel
           key: ${{ matrix.cases.toolchain }}-${{ matrix.cases.toolchain-version }}
@@ -60,6 +64,9 @@ jobs:
   # based on https://dev.to/zirkelc/trigger-github-workflow-for-comment-on-pull-request-45l2
   pre-test-comment:
     name: "Integration Test Build - Set commit status pending"
+    permissions:
+      statuses: write
+      pull-requests: read
     if: github.event.issue.pull_request && contains(github.event.comment.body, '/test')
     runs-on: ubuntu-latest
     steps:
@@ -75,6 +82,9 @@ jobs:
 
   test-comment:
     name: "Integration Test Build (CUDA ${{ matrix.cases.cuda-version }} on ${{ matrix.cases.os }})"
+    permissions:
+      contents: read
+      pull-requests: read
     needs: [pre-test-comment]
     runs-on: ${{ matrix.cases.os }}
     timeout-minutes: 60
@@ -103,10 +113,10 @@ jobs:
         with:
           ref: ${{ steps.comment-branch.outputs.head_ref }}
 
-      - uses: bazelbuild/setup-bazelisk@v2
+      - uses: bazelbuild/setup-bazelisk@v3
       - name: Mount bazel cache
         if: ${{ !startsWith(matrix.cases.os, 'windows') }}
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/bazel
           key: ${{ matrix.cases.toolchain }}-${{ matrix.cases.toolchain-version }}
@@ -132,6 +142,10 @@ jobs:
 
   post-test-comment:
     name: "Integration Test Build - Set commit status as test result"
+    permissions:
+      statuses: write
+      pull-requests: read
+      issues: write
     needs: [test-comment]
     runs-on: ubuntu-latest
     steps:
