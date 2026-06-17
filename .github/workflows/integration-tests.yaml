@@ -119,10 +119,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/bazel
-          key: ${{ matrix.cases.toolchain }}-${{ matrix.cases.toolchain-version }}
+          # Scope key to the PR head SHA to prevent untrusted code from poisoning
+          # the shared main-branch cache. restore-keys still allows reading from
+          # a warmer main-branch cache without writing back to it.
+          key: pr-${{ steps.comment-branch.outputs.head_sha }}-${{ matrix.cases.toolchain }}-${{ matrix.cases.toolchain-version }}
+          restore-keys: |
+            ${{ matrix.cases.toolchain }}-${{ matrix.cases.toolchain-version }}
 
       - name: Setup build environment
-        uses: ./.github/actions/set-build-env
+        # Pin to main so the PR's (untrusted) version of this action is never executed.
+        uses: serve-robotics/rules_cuda/.github/actions/set-build-env@main
         with:
           os: ${{ matrix.cases.os }}
           cuda-version: ${{ matrix.cases.cuda-version }}
